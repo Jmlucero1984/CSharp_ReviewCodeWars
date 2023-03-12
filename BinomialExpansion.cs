@@ -44,7 +44,7 @@ public class HelloWorld
         string alg="";
         string pattern = @"([a-zA-Z][\^]?[0-9]*)";
         Regex rg = new Regex(pattern);
-         if(op1!=null && op2!=null){
+         if(op1!="" && op2!=""){
         MatchCollection matchAlgOp1= rg.Matches(op1);
         MatchCollection matchAlgOp2= rg.Matches(op2);
         for (int count = 0; count < matchAlgOp1.Count; count++){
@@ -57,7 +57,7 @@ public class HelloWorld
             
         }
         
-        }
+        } else{ alg=op1+op2;}
         Console.WriteLine("---- RETURN MULTALG { "+alg+"  }");
          return alg;
          
@@ -82,8 +82,9 @@ public class HelloWorld
         bool signop1=(rg.IsMatch(op1));
         bool signop2=(rg.IsMatch(op2));
         bool overallsign=signop1^signop2;
-        if(op1=="1") return ""+overallsign+op2;
-        if(op2=="1") return ""+overallsign+op1;
+         string finalsing=overallsign? "-":"";
+        if(op1=="1") return ""+finalsing+op2;
+        if(op2=="1") return ""+finalsing+op1;
         if(op2=="0" || op1 =="0") return "";
         
         string letop1="";
@@ -92,7 +93,7 @@ public class HelloWorld
         string algeb = @"[a-zA-Z].*";
         rg = new Regex(algeb);
         var algop1=rg.Matches(op1);
-        Console.WriteLine("\n---------******---------");
+  
         
         if(algop1.Count!=0 && algop1[0].Value!="") {
             Console.WriteLine(algop1[0]);
@@ -107,7 +108,7 @@ public class HelloWorld
             Console.WriteLine(op1);
         }
         var algop2=rg.Matches(op2);
-        Console.WriteLine("\n------------------------");
+   
         
         if(algop2.Count!=0 && algop2[0].Value!="") {
             Console.WriteLine(algop2[0]);
@@ -124,10 +125,10 @@ public class HelloWorld
         var alg=multAlg(letop1, letop2);
        
         Console.WriteLine("LETOP:"+alg);
-             string finalsing=overallsign? "":"-";
+            
         int mult=(Int32.Parse(op1))*(Int32.Parse(op2));
         Console.WriteLine("RESULT: "+mult+alg);
-        Console.WriteLine("\n---------******---------");
+        
         return mult+alg;
     }
     
@@ -136,7 +137,7 @@ public class HelloWorld
      static List<string> extractTerms(string expression){
          Console.WriteLine("---- EXTRACTING TERMS {"+expression+"} ----");
         
-        string pattern = @"([+,-]?([0-9a-zA-Z][\^]?[0-9]*))";
+        string pattern = @"([+,-]?[0-9a-zA-Z]*[[\^]?[0-9]?)";
         List<string> terms = new List<string>();
         Regex rg = new Regex(pattern);
         MatchCollection matchedAuthors = rg.Matches(expression);
@@ -155,7 +156,9 @@ public class HelloWorld
             return extractTerms(expression);
         };
         foreach(var i in extractTerms(expression)){
+            
             foreach(var j in expand(expression,iters-1)){
+                Console.WriteLine("TERM i: "+i+"   TERM j: "+j);
                 output.Add(multiply(i,j));
             }
         }
@@ -165,25 +168,28 @@ public class HelloWorld
     
     public static void Main(string[] args)
     {
-        string expre="(x+1)^2";
+        string expre="(r+0)^1";
         string pattern = @"\(.*?\)";
         Regex rg = new Regex(pattern);
-        Console.WriteLine(rg.IsMatch(expre));
+         
         int coeff=Int32.Parse(expre.Split("^")[1]);
-        
-        MatchCollection matchedAuthors = rg.Matches(expre);
-        for (int count = 0; count < matchedAuthors.Count; count++){
-            string extracted = matchedAuthors[count].Value;
+        if(coeff==0) Console.WriteLine(1);
+        else if(coeff==1) {
+            var extracted=expre.Split("^")[0];
             int chainLen=extracted.Length;
-            Console.WriteLine("LARGO:"+chainLen);
-            extracted=extracted.Substring(1,chainLen-2);
-            var expanded= expand(extracted, coeff);
-            foreach(var i in expanded) {
-                Console.WriteLine("$$ "+i);
+            Console.WriteLine(extracted.Substring(1,chainLen-2));}
+        else {
+        MatchCollection matchedAuthors = rg.Matches(expre);
+            for (int count = 0; count < matchedAuthors.Count; count++){
+                string extracted = matchedAuthors[count].Value;
+                int chainLen=extracted.Length;
+                Console.WriteLine("LARGO:"+chainLen);
+                extracted=extracted.Substring(1,chainLen-2);
+                var expanded= expand(extracted, coeff);
+                foreach(var i in expanded) {
+                    Console.WriteLine("$$ "+i);
+                }
             }
-            
-            
-            
         }
         expre= Regex.Replace(expre, pattern, "");
         Console.WriteLine("SOBRANTE:"+expre);
